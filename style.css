@@ -40,37 +40,27 @@ body {
 .centered { align-items: center; text-align: center; }
 
 /* ---------- Loading screen ---------- */
+/* The artwork is scaled to fill the screen height; tall phones crop a little off each side */
 .splash {
-  background: var(--sage);
+  background: var(--sage) url('assets/splash.jpg') center / cover no-repeat;
   color: var(--sage-ink);
-  align-items: center;
-  text-align: center;
-  padding-top: calc(env(safe-area-inset-top) + 40px);
-  padding-bottom: calc(env(safe-area-inset-bottom) + 34px);
+  padding: 0;
 }
 .splash-frame {
   position: absolute;
   inset: calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 12px);
-  border: 0.5px solid var(--sage-line);
-  border-radius: 18px;
+  border: 1px solid var(--sage-ink);
+  border-radius: 6px;
+  outline: 0.5px solid var(--sage-ink);
+  outline-offset: -5px;
   pointer-events: none;
 }
-.splash-icon {
-  width: 96px; height: 96px;
-  border-radius: 22%;
-  overflow: hidden;
-}
-.splash-icon img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.07); display: block; }
-.splash-name { font-family: var(--caps); font-size: 32px; letter-spacing: 8px; margin-top: 16px; padding-left: 8px; }
-.splash-quote { font-style: italic; font-size: 29px; line-height: 1.35; color: #3F4C38; }
-.wreath { position: relative; width: 270px; height: 165px; margin-top: 14px; }
-.wreath svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.motto { position: absolute; left: 0; right: 0; top: 34px; font-family: var(--caps); font-size: 26px; line-height: 1.15; letter-spacing: 1px; }
-.splash-bottom { height: 40px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
-.loading-line { width: 110px; height: 2px; border-radius: 2px; overflow: hidden; background: #9AA37C; transition: opacity .6s; }
+/* Sits where the artwork's own loading bar used to be (about 90% down) */
+.splash-bottom { position: absolute; left: 0; right: 0; top: 88.8%; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.loading-line { width: 150px; height: 2px; border-radius: 2px; overflow: hidden; background: rgba(47, 59, 42, .22); transition: opacity .6s; }
 .loading-line i { display: block; width: 40%; height: 100%; background: var(--sage-ink); animation: slide 1.6s ease-in-out infinite; }
 @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
-.continue { font-family: var(--caps); font-size: 15px; letter-spacing: 3px; color: var(--sage-line); opacity: 0; transition: opacity .8s; margin-top: 6px; }
+.continue { font-family: var(--caps); font-size: 16px; letter-spacing: 3px; color: var(--sage-ink); opacity: 0; transition: opacity .8s; }
 .splash.ready .loading-line { opacity: 0; }
 .splash.ready .continue { opacity: 1; animation: breathe 2.8s ease-in-out .8s infinite; }
 .splash.ready { cursor: pointer; }

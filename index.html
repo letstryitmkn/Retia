@@ -17,44 +17,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="preload" href="assets/splash.jpg" as="image">
 </head>
 <body>
 
   <!-- Loading screen -->
-  <section id="splash" class="screen splash">
+  <!-- The artwork (assets/splash.jpg) already contains the icon, name and quote -->
+  <section id="splash" class="screen splash" role="img" aria-label="Retia. Icarus laughed as he fell, for he knew: to fall means to once have soared.">
     <div class="splash-frame" aria-hidden="true"></div>
-    <div class="splash-icon"><img src="assets/icon-source.webp" alt=""></div>
-    <div class="splash-name">Retia</div>
-    <div class="spacer"></div>
-    <p class="splash-quote">Icarus laughed as he fell,<br>for he knew</p>
-    <div class="wreath">
-      <svg viewBox="0 0 200 122" aria-hidden="true">
-        <defs>
-          <g id="olive-half" fill="#9DA57F" stroke="#3D4B37" stroke-width="0.7">
-            <path d="M100 112 Q20 110 22 20" fill="none" stroke-width="1"/>
-            <g transform="translate(84.8 110.7) rotate(150)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
-            <g transform="translate(84.8 110.7) rotate(220)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
-            <g transform="translate(65.1 105.5) rotate(140)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
-            <g transform="translate(65.1 105.5) rotate(215)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
-            <g transform="translate(49.1 96.3) rotate(125)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
-            <g transform="translate(49.1 96.3) rotate(200)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
-            <g transform="translate(36.8 83.2) rotate(110)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
-            <g transform="translate(36.8 83.2) rotate(190)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
-            <g transform="translate(28.2 66.1) rotate(100)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
-            <g transform="translate(28.2 66.1) rotate(175)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
-            <g transform="translate(23.3 45) rotate(90)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
-            <g transform="translate(23.3 45) rotate(165)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
-            <g transform="translate(22 20) rotate(-85)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
-            <ellipse cx="44" cy="104" rx="2.4" ry="1.8" fill="#3D4B37" stroke="none"/>
-            <ellipse cx="25" cy="58" rx="2.4" ry="1.8" fill="#3D4B37" stroke="none"/>
-          </g>
-        </defs>
-        <use href="#olive-half"/>
-        <g transform="translate(200 0) scale(-1 1)"><use href="#olive-half"/></g>
-      </svg>
-      <p class="motto">To fall means<br>to once have<br>soared.</p>
-    </div>
-    <div class="spacer"></div>
     <div class="splash-bottom">
       <div class="loading-line" aria-hidden="true"><i></i></div>
       <div class="continue">Touch to continue</div>

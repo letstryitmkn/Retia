@@ -1,9 +1,9 @@
 // Offline support: keeps a copy of the app and the Folios on the phone.
 // Change VERSION whenever app files change, so phones pick up the new copy.
-const VERSION = 'retia-2';
+const VERSION = 'retia-3';
 const SHELL = [
   './', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest',
-  'assets/icon-source.webp', 'assets/icon-192.png', 'assets/icon-512.png', 'assets/apple-touch-icon.png', 'assets/icon-32.png',
+  'assets/splash.jpg', 'assets/icon-192.png', 'assets/icon-512.png', 'assets/apple-touch-icon.png', 'assets/icon-32.png',
 ];
 const NETWORK_TIMEOUT_MS = 4000;
 
