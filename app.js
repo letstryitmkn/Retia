@@ -740,6 +740,17 @@ $('b-forgotten').addEventListener('click', () => judge(false));
 $('b-revisit').addEventListener('click', () => { pageStack.length = 0; openPage(revisitPage); });
 $('p-back').addEventListener('click', pageBack);
 document.querySelectorAll('[data-menu]').forEach((b) => b.addEventListener('click', openContents));
+// No zooming: iPhone ignores the page's "no zoom" setting, so block pinch and double-tap here too
+for (const type of ['gesturestart', 'gesturechange', 'gestureend']) {
+  document.addEventListener(type, (e) => e.preventDefault(), { passive: false });
+}
+document.addEventListener('touchmove', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+let lastTouchEnd = 0;
+document.addEventListener('touchend', (e) => {
+  const now = Date.now();
+  if (now - lastTouchEnd < 300 && !e.target.closest('button')) e.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
 window.addEventListener('online', updateReminder);
 window.addEventListener('offline', updateReminder);
 

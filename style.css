@@ -15,6 +15,8 @@
 
 * { box-sizing: border-box; margin: 0; }
 html, body { height: 100%; }
+/* No pinch or double-tap zoom (text size is set in Settings instead) */
+html, body { touch-action: pan-x pan-y; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   background: var(--paper);
   color: var(--ink);

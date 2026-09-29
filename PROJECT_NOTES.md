@@ -497,6 +497,7 @@ Answered:
 | 2026-09-29 | Removed the faint astrolabe circles behind the notes (got in the way of reading). Not pushed yet |
 | 2026-09-29 | Measured: notes are 124–155 words = **~1.5–1.7 phone screens** each (iPhone-size, 375×812). Discussing how to reduce scrolling: cap length / 2 pages per note / smoother scroll |
 | 2026-09-29 | **New loading screen artwork** (my illustration: clouds, sea, temple on a cliff, birds, icon + RETIA + Icarus quote baked in) replaces the olive-wreath layout. `tools/make-splash.ps1` paints out its drawn loading bar + "Loading…" and trims its border → `assets/splash.jpg`. App draws its own double border + sliding line + "Touch to continue" where the bar was. Known: tall phones crop the sides (temple mostly cut); a phone-shaped (9:19.5) version of the art would fix it |
+| 2026-09-29 | **Zoom locked**: no pinch or double-tap zoom (viewport setting + CSS + iPhone gesture blocking). Text size is changed in Settings instead. Release v5 |
 | 2026-09-29 | **Stage 2 built**: Contents menu, Progress, Library, Look up later, Settings, offline mode, home-screen manifest + icons, protected storage. No backup (decided) |
 | 2026-09-29 | **Chosen: two pages per note** (i: In short + Explained → Continue; ii: Example + Why it matters → Understood). All 21 notes now fit without scrolling (trimmed "Sunk costs" example slightly) |
 | 2026-09-29 | No progress backup for now |
