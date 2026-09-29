@@ -3,7 +3,7 @@
 // ---------- Settings ----------
 const DAILY_NOTES = 7;          // goal and cap per day
 const REVIEW_AFTER_DAYS = 3;    // a forgotten note comes back this many days later
-const SPLASH_MS = 5000;         // loading screen before "Touch to continue"
+const SPLASH_MS = 3500;         // loading screen before "Touch to continue"
 const STORE_KEY = 'retia.v1';
 
 const AI_LINKS = {
@@ -78,11 +78,23 @@ function parsePack(file, text) {
 function escapeHtml(s) {
   return s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
+// Straight quotes look backwards in IM Fell, so use curly ones
+function smartQuotes(s) {
+  return s
+    .replace(/(^|[\s(\[—–-])"/g, '$1“').replace(/"/g, '”')
+    .replace(/(^|[\s(\[—–-])'/g, '$1‘').replace(/'/g, '’');
+}
 function inline(s) {
-  return escapeHtml(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
+  return escapeHtml(smartQuotes(s)).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
 }
 function plainText(s) { return s.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1'); }
-function renderBody(note) { return note.paras.map((p) => `<p>${inline(p)}</p>`).join(''); }
+// "**In short:** text" becomes a small label on its own line above the text
+function renderBody(note) {
+  return note.paras.map((p) => {
+    const m = p.match(/^\*\*([^*]+?):\*\*\s*(.*)$/);
+    return m ? `<p><span class="label">${escapeHtml(m[1])}</span>${inline(m[2])}</p>` : `<p>${inline(p)}</p>`;
+  }).join('');
+}
 
 // On GitHub Pages (username.github.io/repo) the pack list comes from GitHub itself.
 function githubRepo() {
@@ -148,7 +160,11 @@ function nextNote(pack) { return pack.notes.find((n) => !state.done[n.id]); }
 // ---------- Screens ----------
 const $ = (id) => document.getElementById(id);
 const screens = ['splash', 'read', 'recall', 'sealed', 'message'];
-function show(name) { for (const s of screens) $(s).hidden = s !== name; }
+// The phone's status bar takes this colour: sage on the loading screen, paper inside the app
+function show(name) {
+  for (const s of screens) $(s).hidden = s !== name;
+  document.querySelector('meta[name="theme-color"]').content = name === 'splash' ? '#B3BA93' : '#E6D3AE';
+}
 
 let current = null;      // note being read
 let browsing = false;    // re-reading today's notes

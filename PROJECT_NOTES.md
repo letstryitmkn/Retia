@@ -236,6 +236,8 @@ Retia/
 **Stage 2 (next):** Settings (ChatGPT/Claude, text size), Look up later list when offline, Library of Folios, progress/stats screen, offline support (service worker), web app manifest + icon sizes
 **Stage 3:** GitHub repo → GitHub Pages → install on phones
 
+**LIVE: https://letstryitmkn.github.io/Retia/** (repo: github.com/letstryitmkn/Retia, published 2026-09-29, checked working)
+
 **Uploading to GitHub (GitHub Desktop)**
 1. File → Add local repository → choose `Desktop\Retia` → "create a repository" → Name `retia` → Create repository
 2. Summary box (bottom left): "First version" → **Commit to main**
@@ -293,7 +295,7 @@ Original three style directions (mocked up in chat):
 - **Chosen: A · sage green `#B3BA93`, English only**, with **bigger text**: quote ~24px italic (two lines, one per sentence), "Retia" ~30px, attribution ~16px
 - (B · tan paper with the Latin above the English was not chosen)
 - Emphasis style: **3 · motto between thin rules** (chosen over small caps on its own line, or large red italic)
-- **Timing: shows ~5 seconds → then a "Touch to continue" prompt appears → tap → into the app**
+- **Timing: shows ~3.5 seconds (changed from 5) → then a "Touch to continue" prompt appears → tap → into the app**
 - Shows **every time** the app is opened (confirmed)
 - **Ornament: 3 · Olive wreath** (chosen). Two olive branches (leaves `#9DA57F`, olives + stems `#3D4B37`) curve up from below and cradle the motto; thin single-line frame around the screen; "Touch to continue" in small caps at the bottom
 - Options that were mocked up:
@@ -466,5 +468,8 @@ Answered:
 | 2026-09-29 | **Mix all 3 subjects every day** (3 / 2 / 2). Notes = In short + Example + Why it matters, plain words, bite-sized |
 | 2026-09-29 | Notes get **more detail**: added an **Explained** part; 110–150 words; Understood button pinned so longer notes can scroll |
 | 2026-09-29 | **Stage 1 built and tested** (core reading loop, Recollection, wax seal, loading screen, 3 sample days) |
+| 2026-09-29 | Published to GitHub Pages; tested on phone: works |
+| 2026-09-29 | Phone feedback fixes: **more spacing** in notes (labels like "In short" on their own line, taller lines, bigger gaps, wider margins); **status bar** now tan inside the app (was sage green from the loading screen); **loading screen 3.5 s** (was 5 s); curly quotes |
+| 2026-09-29 | Loading screen: "Icarus laughed as he fell, for he knew" enlarged (23px → 29px) |
 | 2026-09-29 | No progress backup for now |
 | 2026-09-29 | Packs found automatically; just drop the file in `packs/` |
