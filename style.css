@@ -37,20 +37,43 @@ body {
   padding: calc(env(safe-area-inset-top) + 18px) 20px calc(env(safe-area-inset-bottom) + 18px);
   overflow: hidden;
 }
-.paper { background: radial-gradient(ellipse at 50% 40%, #EBDAB8 0%, var(--paper) 60%, #DCC59C 100%); }
+/* The paper shading sits on the whole screen, so wide screens (unfolded Fold, tablets) have no visible column edge */
+body { background: radial-gradient(ellipse at 50% 40%, #EBDAB8 0%, var(--paper) 60%, #DCC59C 100%) fixed; }
+.paper { background: transparent; }
 .spacer { flex: 1; }
 .centered { align-items: center; text-align: center; }
 
 /* ---------- Loading screen ---------- */
-/* The artwork is scaled to fill the screen height; tall phones crop a little off each side */
+/* The artwork always fills the screen height. Tall phones crop a little off each side;
+   wide screens (tablets, unfolded Galaxy Fold) show it centred, fading into sage at the sides */
 .splash {
-  background: var(--sage) url('assets/splash.jpg') center / cover no-repeat;
+  --art-width: min(100vw, calc(100vh * 1032 / 1366));
+  max-width: none;
+  background: var(--sage);
   color: var(--sage-ink);
   padding: 0;
 }
+.splash::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 0; right: 0;
+  width: var(--art-width);
+  margin: 0 auto;
+  background: url('assets/splash.jpg') center / cover no-repeat;
+}
+@media (min-aspect-ratio: 1032/1366) {
+  .splash::before {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  }
+}
 .splash-frame {
   position: absolute;
-  inset: calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 12px);
+  top: calc(env(safe-area-inset-top) + 12px);
+  bottom: calc(env(safe-area-inset-bottom) + 12px);
+  left: 0; right: 0;
+  width: calc(var(--art-width) - 24px);
+  margin: 0 auto;
   border: 1px solid var(--sage-ink);
   border-radius: 6px;
   outline: 0.5px solid var(--sage-ink);

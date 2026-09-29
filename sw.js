@@ -1,8 +1,8 @@
 // Offline support: keeps a copy of the app and the Folios on the phone.
 // On every release: bump the number here AND the ?v= on style.css and app.js in index.html.
-const VERSION = 'retia-5';
+const VERSION = 'retia-6';
 const SHELL = [
-  './', 'index.html', 'style.css?v=5', 'app.js?v=5', 'manifest.webmanifest',
+  './', 'index.html', 'style.css?v=6', 'app.js?v=6', 'manifest.webmanifest',
   'assets/splash.jpg', 'assets/icon-192.png', 'assets/icon-512.png', 'assets/apple-touch-icon.png', 'assets/icon-32.png',
 ];
 const NETWORK_TIMEOUT_MS = 4000;
