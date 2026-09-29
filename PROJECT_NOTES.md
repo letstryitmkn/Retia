@@ -196,6 +196,16 @@ Retia/
 - In the phone's own storage (IndexedDB). Each person/phone tracks separately
 - Each concept is identified by *pack file + concept title*, so fixing a typo in the text keeps progress. **Renaming a concept title resets that one concept**
 - ⚠️ Known risk: deleting the home-screen app or clearing browser data wipes progress. **Accepted for now, no backup feature** (could add Export/Import later)
+- Full list of ways progress can be lost (reviewed 2026-09-29):
+  1. Deleting Retia from the home screen (iPhone deletes its saved data with it)
+  2. Clearing browser history/website data (Safari or Chrome settings)
+  3. Private / incognito browsing (wiped when closed)
+  4. iPhone: using Retia in a **Safari tab** instead of the home-screen app. Safari can wipe a site's data after ~7 days unused; home-screen apps are exempt. Safari tab and home-screen app also keep **separate** progress
+  5. Phone very low on storage: the browser may clear website data (mainly Android) → fix: ask the browser for "persistent storage" (planned, Stage 2)
+  6. New phone, different browser, or different device: progress doesn't move across
+  7. Content changes: renaming a note's title resets that note; renaming or deleting a Folio file loses its progress
+  8. Changing the GitHub username (the site address changes)
+  9. Opening the app with `?reset`
 - iPhone: install via Safari → Share → Add to Home Screen. The installed app has its own storage, separate from Safari tabs
 
 **Pacing: how "Day" and the daily limit work** (decided)
@@ -236,7 +246,17 @@ Retia/
 2. Open `http://localhost:8123/`
 3. Test helpers in the address bar: `?reset` (wipe progress), `?today=2026-10-05` (pretend it's another day), `?nosplash` (skip loading screen). Combine with `&`
 
-**Stage 2 (next):** Settings (ChatGPT/Claude, text size), Look up later list when offline, Library of Folios, progress/stats screen, offline support (service worker), web app manifest + icon sizes
+**Stage 2: DONE, 2026-09-29** (tested in the browser pane; offline mode must be tested on a real phone, because the pane can't run offline workers)
+- **Contents menu** (☰ top right on the reading and sealed screens): Progress · Library · Look up later · Settings
+- **Progress**: notes learned, days unbroken, longest run, % remembered, current Folio bar (e.g. "14 of 21 notes · Day III of XV · on track / N days in arrears"), 5-week calendar (red = sealed, tan = started)
+- **Library**: every Folio with status (Current / Paused / Not started / Finished) → open one to see its themes and all notes by day; tap a read note to re-read it; "Make this my current Folio" to switch
+- **Look up later**: with no signal, Look it up / Ask AI saves the note and shows "No signal. Saved to Look up later." Back online, a red reminder appears under the dots; tap a saved note to open it (it then leaves the list)
+- **Settings**: Ask AI opens ChatGPT or Claude; text size Small / Medium / Large (Large may need a small scroll)
+- **Offline mode** (`sw.js`): keeps the app, fonts and Folios on the phone; new Folios download when online (4 s timeout on slow signal). **When app files change, bump `VERSION` in sw.js** so phones take the new copy; updates show on the **second** open after a push
+- **Home-screen setup** (`manifest.webmanifest` + meta tags): opens full screen like a real app, with the wing icon
+- **Protected storage**: the app asks the browser not to clear its data when space runs low
+- **Icons**: `tools/make-icons.ps1` fills the black corners of `assets/icon-source.webp` with sage, crops square, exports 512 / 192 / 180 (iPhone) / 32 (tab) / maskable 512 (Android). Rerun it if the icon art changes
+- Testing helper added: `?sw` turns on offline mode on localhost
 **Stage 3:** GitHub repo → GitHub Pages → install on phones
 
 **LIVE: https://letstryitmkn.github.io/Retia/** (repo: github.com/letstryitmkn/Retia, published 2026-09-29, checked working)
@@ -476,6 +496,7 @@ Answered:
 | 2026-09-29 | Loading screen: "Icarus laughed as he fell, for he knew" enlarged (23px → 29px) |
 | 2026-09-29 | Removed the faint astrolabe circles behind the notes (got in the way of reading). Not pushed yet |
 | 2026-09-29 | Measured: notes are 124–155 words = **~1.5–1.7 phone screens** each (iPhone-size, 375×812). Discussing how to reduce scrolling: cap length / 2 pages per note / smoother scroll |
+| 2026-09-29 | **Stage 2 built**: Contents menu, Progress, Library, Look up later, Settings, offline mode, home-screen manifest + icons, protected storage. No backup (decided) |
 | 2026-09-29 | **Chosen: two pages per note** (i: In short + Explained → Continue; ii: Example + Why it matters → Understood). All 21 notes now fit without scrolling (trimmed "Sunk costs" example slightly) |
 | 2026-09-29 | No progress backup for now |
 | 2026-09-29 | Packs found automatically; just drop the file in `packs/` |

@@ -4,26 +4,39 @@
 const DAILY_NOTES = 7;          // goal and cap per day
 const REVIEW_AFTER_DAYS = 3;    // a forgotten note comes back this many days later
 const SPLASH_MS = 3500;         // loading screen before "Touch to continue"
+const NETWORK_TIMEOUT_MS = 4000; // give up on a slow connection and use saved copies
 const STORE_KEY = 'retia.v1';
 
 const AI_LINKS = {
   chatgpt: (q) => `https://chatgpt.com/?q=${encodeURIComponent(q)}`,
   claude: (q) => `https://claude.ai/new?q=${encodeURIComponent(q)}`,
 };
+const AI_NAMES = { chatgpt: 'ChatGPT', claude: 'Claude' };
+const TEXT_SIZES = { s: 'Small', m: 'Medium', l: 'Large' };
 
-// Testing helpers: ?reset clears progress, ?today=2026-10-02 pretends it's another day, ?nosplash skips the loading screen
+// Testing helpers: ?reset clears progress, ?today=2026-10-02 pretends it's another day,
+// ?nosplash skips the loading screen, ?sw turns on offline mode while testing on localhost
 const params = new URLSearchParams(location.search);
 
 // ---------- Saved progress (on this phone only) ----------
 function freshState() {
-  return { activePack: null, packs: {}, done: {}, days: {}, reviews: {}, settings: { ai: 'chatgpt' } };
+  return {
+    activePack: null, packs: {}, done: {}, days: {}, reviews: {}, lookups: [],
+    settings: { ai: 'chatgpt', textSize: 'm' },
+  };
 }
 function loadState() {
+  const s = freshState();
   try {
     const raw = localStorage.getItem(STORE_KEY);
-    if (raw) return Object.assign(freshState(), JSON.parse(raw));
+    if (raw) {
+      const saved = JSON.parse(raw);
+      Object.assign(s, saved);
+      s.settings = Object.assign(freshState().settings, saved.settings);
+      s.lookups = saved.lookups || [];
+    }
   } catch (e) { /* storage unavailable: start fresh */ }
-  return freshState();
+  return s;
 }
 let state = params.has('reset') ? freshState() : loadState();
 function save() {
@@ -39,6 +52,14 @@ function toDate(iso) { const [y, m, d] = iso.split('-').map(Number); return new 
 function today() { return params.get('today') || isoDate(new Date()); }
 function addDays(iso, n) { const d = toDate(iso); d.setDate(d.getDate() + n); return isoDate(d); }
 function daysBetween(a, b) { return Math.round((toDate(b) - toDate(a)) / 86400000); }
+function shortDate(iso) { return toDate(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); }
+
+function toRoman(n) {
+  const table = [[100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+  let out = '';
+  for (const [v, s] of table) while (n >= v) { out += s; n -= v; }
+  return out;
+}
 
 function dayRecord(date = today()) {
   if (!state.days[date]) state.days[date] = { read: [], results: {}, sealed: false, recalled: false };
@@ -76,7 +97,7 @@ function parsePack(file, text) {
 }
 
 function escapeHtml(s) {
-  return s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
 // Straight quotes look backwards in IM Fell, so use curly ones
 function smartQuotes(s) {
@@ -88,6 +109,7 @@ function inline(s) {
   return escapeHtml(smartQuotes(s)).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
 }
 function plainText(s) { return s.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1'); }
+
 // Each note is two pages: In short + Explained, then Example + Why it matters
 function splitPages(note) {
   const at = note.paras.findIndex((p) => /^\*\*Example/i.test(p));
@@ -105,6 +127,12 @@ function renderParas(paras) {
   }).join('');
 }
 
+async function fetchWithTimeout(url, options = {}) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), NETWORK_TIMEOUT_MS);
+  try { return await fetch(url, { ...options, signal: ctrl.signal }); } finally { clearTimeout(timer); }
+}
+
 // On GitHub Pages (username.github.io/repo) the pack list comes from GitHub itself.
 function githubRepo() {
   const host = location.hostname;
@@ -118,7 +146,7 @@ async function listPackFiles() {
   const gh = githubRepo();
   if (gh) {
     try {
-      const res = await fetch(`https://api.github.com/repos/${gh.owner}/${gh.repo}/contents/packs`);
+      const res = await fetchWithTimeout(`https://api.github.com/repos/${gh.owner}/${gh.repo}/contents/packs`);
       if (res.ok) {
         const files = (await res.json()).filter((f) => f.type === 'file' && f.name.endsWith('.md')).map((f) => f.name).sort();
         localStorage.setItem(STORE_KEY + '.packlist', JSON.stringify(files));
@@ -128,11 +156,14 @@ async function listPackFiles() {
   } else {
     // Local testing: read the dev server's folder listing
     try {
-      const res = await fetch('packs/', { cache: 'no-store' });
+      const res = await fetchWithTimeout('packs/', { cache: 'no-store' });
       if (res.ok) {
         const html = await res.text();
         const files = [...html.matchAll(/href="([^"]+\.md)"/g)].map((m) => decodeURIComponent(m[1].split('/').pop())).sort();
-        if (files.length) return files;
+        if (files.length) {
+          localStorage.setItem(STORE_KEY + '.packlist', JSON.stringify(files));
+          return files;
+        }
       }
     } catch (e) { /* fall back below */ }
   }
@@ -144,19 +175,19 @@ const noteIndex = new Map(); // id -> { note, pack }
 
 async function loadPacks() {
   const files = await listPackFiles();
-  const loaded = [];
-  for (const file of files) {
+  const loaded = await Promise.all(files.map(async (file) => {
     try {
-      const res = await fetch('packs/' + encodeURIComponent(file), { cache: 'no-cache' });
-      if (res.ok) loaded.push(parsePack(file, await res.text()));
-    } catch (e) { /* skip unreadable pack */ }
-  }
-  packs = loaded.filter((p) => p.notes.length);
+      const res = await fetchWithTimeout('packs/' + encodeURIComponent(file), { cache: 'no-cache' });
+      return res.ok ? parsePack(file, await res.text()) : null;
+    } catch (e) { return null; }
+  }));
+  packs = loaded.filter((p) => p && p.notes.length);
   noteIndex.clear();
   for (const pack of packs) for (const note of pack.notes) noteIndex.set(note.id, { note, pack });
 }
 
 function isComplete(pack) { return pack.notes.every((n) => state.done[n.id]); }
+function doneCount(pack) { return pack.notes.filter((n) => state.done[n.id]).length; }
 function currentPack() {
   let pack = packs.find((p) => p.file === state.activePack);
   if (pack && !isComplete(pack)) return pack;
@@ -168,19 +199,21 @@ function nextNote(pack) { return pack.notes.find((n) => !state.done[n.id]); }
 
 // ---------- Screens ----------
 const $ = (id) => document.getElementById(id);
-const screens = ['splash', 'read', 'recall', 'sealed', 'message'];
+const screens = ['splash', 'read', 'recall', 'sealed', 'message', 'page'];
 // The phone's status bar takes this colour: sage on the loading screen, paper inside the app
 function show(name) {
   for (const s of screens) $(s).hidden = s !== name;
   document.querySelector('meta[name="theme-color"]').content = name === 'splash' ? '#B3BA93' : '#E6D3AE';
 }
 
-let current = null;      // note being read
-let browsing = false;    // re-reading today's notes
-let recall = null;       // { queue, index }
+let current = null;       // note being read
+let browsing = false;     // re-reading a note already learned
+let browseBack = null;    // where "Back" goes after re-reading
+let recall = null;        // { queue, index }
 
 function route() {
   browsing = false;
+  pageStack.length = 0;
   const date = today();
   const rec = dayRecord(date);
   if (rec.sealed) return showSealed(false);
@@ -192,7 +225,7 @@ function route() {
   if (queue.length) return startRecall(queue);
   if (rec.read.length || Object.keys(rec.results).length) { sealDay(); return showSealed(true); }
 
-  if (!packs.length) return showMessage('No Folio yet', 'Add a Folio file to the packs folder, then open Retia again.');
+  if (!packs.length) return showMessage('No Folio yet', 'Add a Folio file to the packs folder, then open Retia again. If you are offline, try again with signal.');
   return showMessage('Every Folio finished', 'You have read every note in every Folio. Add the next Folio to the packs folder.');
 }
 
@@ -205,6 +238,7 @@ function arrearsDays(pack, date) {
   const expected = Math.min((calendarDay - 1) * DAILY_NOTES, pack.notes.length);
   return Math.max(0, Math.floor((expected - doneBefore) / DAILY_NOTES));
 }
+function arrearsText(n) { return n === 1 ? '1 day in arrears' : `${n} days in arrears`; }
 
 function renderDots(el, count) {
   el.innerHTML = Array.from({ length: DAILY_NOTES }, (_, i) => `<i class="${i < count ? 'on' : ''}"></i>`).join('');
@@ -216,16 +250,19 @@ function showRead(note, pack, animate = false) {
   const rec = dayRecord(date);
   if (!browsing) {
     state.packs[pack.file] = state.packs[pack.file] || {};
-    if (!state.packs[pack.file].startedOn) { state.packs[pack.file].startedOn = date; save(); }
+    const started = state.packs[pack.file].startedOn;
+    if (!started || started > date) { state.packs[pack.file].startedOn = date; save(); }
   }
 
   $('r-where').textContent = `${pack.title} · Day ${note.day}`;
   $('r-count').textContent = browsing ? 'Revisiting' : `${rec.read.length} / ${DAILY_NOTES}`;
+  $('r-dots').hidden = browsing;
   renderDots($('r-dots'), rec.read.length);
 
   const behind = browsing ? 0 : arrearsDays(pack, date);
   $('r-arrears').hidden = behind < 1;
-  $('r-arrears').textContent = behind === 1 ? '1 day in arrears' : `${behind} days in arrears`;
+  $('r-arrears').textContent = arrearsText(behind);
+  updateReminder();
 
   const theme = pack.themes[note.subject];
   $('r-subject').textContent = note.subject ? (theme ? `${note.subject} · ${theme}` : note.subject) : '';
@@ -275,7 +312,7 @@ function advance() {
 
 function understood() {
   if (turning || !current) return;
-  if (browsing) return showRevisitList();
+  if (browsing) { browsing = false; return browseBack ? browseBack() : route(); }
   const date = today();
   const rec = dayRecord(date);
   state.done[current.id] = date;
@@ -291,6 +328,13 @@ function understood() {
     if (rec.read.length < DAILY_NOTES && pack) showRead(nextNote(pack), pack, true);
     else route();
   }, 220);
+}
+
+// Re-read a note already learned; "Back" returns to where you came from
+function browse(note, pack, back) {
+  browsing = true;
+  browseBack = back;
+  showRead(note, pack);
 }
 
 // Swipe left = next page (then Understood), swipe right = previous page
@@ -309,6 +353,7 @@ function understood() {
   }, { passive: true });
 })();
 
+// ---------- Look it up / Ask AI (saved for later when offline) ----------
 function noteQuery(note) {
   const pack = noteIndex.get(note.id)?.pack;
   const theme = pack?.themes[note.subject];
@@ -317,15 +362,45 @@ function noteQuery(note) {
   return `Explain "${note.title}"${about ? ` (${about})` : ''} in more depth, with real-world examples. Here's what I already know: ${known}`;
 }
 
-function lookItUp() {
-  if (!current) return;
-  const q = [current.title, current.subject].filter(Boolean).join(' ');
-  window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank', 'noopener');
+function openExternal(kind, note) {
+  const url = kind === 'ask'
+    ? (AI_LINKS[state.settings.ai] || AI_LINKS.chatgpt)(noteQuery(note))
+    : `https://www.google.com/search?q=${encodeURIComponent([note.title, note.subject].filter(Boolean).join(' '))}`;
+  window.open(url, '_blank', 'noopener');
 }
-function askAI() {
+
+function external(kind) {
   if (!current) return;
-  const link = AI_LINKS[state.settings.ai] || AI_LINKS.chatgpt;
-  window.open(link(noteQuery(current)), '_blank', 'noopener');
+  if (!navigator.onLine) {
+    if (!state.lookups.some((l) => l.id === current.id && l.kind === kind)) {
+      state.lookups.push({ id: current.id, kind, saved: today() });
+      save();
+    }
+    toast('No signal. Saved to Look up later.');
+    return;
+  }
+  openExternal(kind, current);
+}
+
+function savedLookups() { return state.lookups.filter((l) => noteIndex.has(l.id)); }
+
+function updateReminder() {
+  const n = savedLookups().length;
+  const el = $('r-reminder');
+  el.hidden = !n || !navigator.onLine || browsing;
+  el.textContent = n === 1 ? '1 note saved to look up' : `${n} notes saved to look up`;
+}
+
+let toastTimer = null;
+function toast(message) {
+  const t = $('toast');
+  t.textContent = message;
+  t.hidden = false;
+  t.classList.remove('show');
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; }, 2600);
 }
 
 // ---------- Recollection ----------
@@ -405,6 +480,17 @@ function streak() {
   return count;
 }
 
+function longestStreak() {
+  const sealed = Object.keys(state.days).filter((d) => state.days[d].sealed).sort();
+  let best = 0, run = 0, prev = null;
+  for (const d of sealed) {
+    run = prev && daysBetween(prev, d) === 1 ? run + 1 : 1;
+    best = Math.max(best, run);
+    prev = d;
+  }
+  return best;
+}
+
 const WORDS = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven'];
 function showSealed(stampNow) {
   const rec = dayRecord();
@@ -430,36 +516,201 @@ function showSealed(stampNow) {
   show('sealed');
 }
 
-function showRevisitList() {
-  browsing = false;
-  const rec = dayRecord();
-  const items = rec.read.map((id) => noteIndex.get(id)).filter(Boolean);
-  showMessage("Today's notes", '', items.map(({ note }) => ({
-    label: note.title,
-    sub: note.subject,
-    onClick: () => { browsing = true; showRead(note, noteIndex.get(note.id).pack); },
-  })), () => route());
-}
-
-function showMessage(title, text, items = [], onBack = null) {
+function showMessage(title, text) {
   $('m-title').textContent = title;
   $('m-text').textContent = text;
-  const list = $('m-list');
-  list.innerHTML = '';
-  for (const item of items) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.innerHTML = `${escapeHtml(item.label)}${item.sub ? `<small>${escapeHtml(item.sub)}</small>` : ''}`;
-    b.addEventListener('click', item.onClick);
-    list.appendChild(b);
-  }
-  $('m-back').hidden = !onBack;
-  $('m-back').onclick = onBack;
   show('message');
+}
+
+// ---------- Pages: Contents, Progress, Library, Look up later, Settings ----------
+const pageStack = [];
+function openPage(render) { pageStack.push(render); renderTopPage(); }
+function renderTopPage() {
+  const { title, html, after } = pageStack[pageStack.length - 1]();
+  $('p-title').textContent = title;
+  $('p-body').innerHTML = html;
+  $('p-body').scrollTop = 0;
+  if (after) after($('p-body'));
+  show('page');
+}
+function pageBack() {
+  pageStack.pop();
+  if (pageStack.length) renderTopPage();
+  else route();
+}
+function openContents() {
+  browsing = false;
+  pageStack.length = 0;
+  openPage(contentsPage);
+}
+
+function listButton(label, sub, attrs = '') {
+  return `<button type="button" ${attrs}>${escapeHtml(label)}${sub ? `<small>${escapeHtml(sub)}</small>` : ''}</button>`;
+}
+
+function contentsPage() {
+  const n = savedLookups().length;
+  const items = [
+    ['progress', 'Progress', 'Streak, notes learned, calendar'],
+    ['library', 'Library', `${packs.length} ${packs.length === 1 ? 'Folio' : 'Folios'}`],
+    ['lookups', 'Look up later', n ? `${n} saved` : 'Nothing saved'],
+    ['settings', 'Settings', `Ask AI: ${AI_NAMES[state.settings.ai]} · Text: ${TEXT_SIZES[state.settings.textSize]}`],
+  ];
+  const targets = { progress: progressPage, library: libraryPage, lookups: lookupsPage, settings: settingsPage };
+  return {
+    title: 'Contents',
+    html: `<div class="list">${items.map(([k, l, s]) => listButton(l, s, `data-go="${k}"`)).join('')}</div>`,
+    after: (root) => root.querySelectorAll('[data-go]').forEach((b) => { b.onclick = () => openPage(targets[b.dataset.go]); }),
+  };
+}
+
+function calendarHtml() {
+  const date = today();
+  const monday = addDays(date, -((toDate(date).getDay() + 6) % 7));
+  const start = addDays(monday, -28);
+  let cells = '';
+  for (let i = 0; i < 35; i++) {
+    const d = addDays(start, i);
+    const rec = state.days[d];
+    const cls = d > date ? 'future' : rec?.sealed ? 'sealed' : rec?.read?.length ? 'part' : '';
+    cells += `<i class="${cls}${d === date ? ' today' : ''}" title="${shortDate(d)}"></i>`;
+  }
+  const head = ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((x) => `<span>${x}</span>`).join('');
+  return `<div class="cal-head">${head}</div><div class="cal">${cells}</div>
+    <div class="cal-key"><i class="sealed"></i>Sealed <i class="part"></i>Started</div>`;
+}
+
+function progressPage() {
+  const date = today();
+  const learned = Object.keys(state.done).length;
+  const results = Object.values(state.days).flatMap((d) => Object.values(d.results || {}));
+  const pct = results.length ? `${Math.round(results.filter((r) => r === 'remembered').length / results.length * 100)}%` : '–';
+  const stats = [[learned, 'notes learned'], [streak(), 'days unbroken'], [longestStreak(), 'longest run'], [pct, 'remembered']]
+    .map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('');
+
+  let folio = '';
+  const pack = currentPack();
+  if (pack) {
+    const done = doneCount(pack);
+    const started = state.packs[pack.file]?.startedOn;
+    const totalDays = Math.ceil(pack.notes.length / DAILY_NOTES);
+    const dayNo = started ? Math.min(daysBetween(started, date) + 1, totalDays) : 0;
+    const behind = arrearsDays(pack, date);
+    const where = started ? `Day ${toRoman(dayNo)} of ${toRoman(totalDays)} · ${behind ? arrearsText(behind) : 'on track'}` : 'Not started yet';
+    folio = `<div class="block"><div class="block-label">Current Folio</div>
+      <div class="block-title">${escapeHtml(pack.title)}</div>
+      <div class="bar"><i style="width:${Math.round(done / pack.notes.length * 100)}%"></i></div>
+      <div class="block-sub">${done} of ${pack.notes.length} notes · ${where}</div></div>`;
+  }
+  return {
+    title: 'Progress',
+    html: `<div class="stats">${stats}</div>${folio}<div class="block"><div class="block-label">Last five weeks</div>${calendarHtml()}</div>`,
+  };
+}
+
+function libraryPage() {
+  const active = currentPack();
+  const rows = packs.map((p) => {
+    const done = doneCount(p);
+    const status = isComplete(p) ? 'Finished' : p === active ? 'Current' : done ? 'Paused' : 'Not started';
+    return listButton(p.title, `${status} · ${done} / ${p.notes.length} notes`, `data-file="${escapeHtml(p.file)}"`);
+  }).join('');
+  return {
+    title: 'Library',
+    html: packs.length
+      ? `<div class="list">${rows}</div><p class="page-note">New Folios appear here when you add them to the packs folder on GitHub.</p>`
+      : '<p class="page-note">No Folios yet.</p>',
+    after: (root) => root.querySelectorAll('[data-file]').forEach((b) => { b.onclick = () => openPage(() => folioPage(b.dataset.file)); }),
+  };
+}
+
+function folioPage(file) {
+  const p = packs.find((x) => x.file === file);
+  if (!p) return { title: 'Library', html: '<p class="page-note">This Folio is no longer in the packs folder.</p>' };
+  const themes = Object.entries(p.themes).map(([s, t]) => `<div><span>${escapeHtml(s)}:</span> ${escapeHtml(t)}</div>`).join('');
+  let html = `<div class="block"><div class="block-title">${escapeHtml(p.title)}</div><div class="themes">${themes}</div></div>`;
+  if (!isComplete(p) && p !== currentPack()) html += '<button type="button" class="next wide" id="make-current">Make this my current Folio</button>';
+  html += '<div class="list">';
+  let day = null;
+  p.notes.forEach((n, i) => {
+    if (n.day !== day) { day = n.day; html += `<div class="list-day">Day ${escapeHtml(day)}</div>`; }
+    const done = !!state.done[n.id];
+    html += listButton(n.title, done ? n.subject : `${n.subject} · not yet read`, `data-i="${i}"${done ? '' : ' disabled'}`);
+  });
+  html += '</div>';
+  return {
+    title: 'Folio',
+    html,
+    after: (root) => {
+      root.querySelector('#make-current')?.addEventListener('click', () => { state.activePack = p.file; save(); route(); });
+      root.querySelectorAll('[data-i]').forEach((b) => { b.onclick = () => browse(p.notes[+b.dataset.i], p, renderTopPage); });
+    },
+  };
+}
+
+function lookupsPage() {
+  const items = savedLookups();
+  const html = items.length
+    ? `<div class="list">${items.map((l, i) => listButton(noteIndex.get(l.id).note.title, `${l.kind === 'ask' ? 'Ask AI' : 'Look it up'} · saved ${shortDate(l.saved)}`, `data-i="${i}"`)).join('')}</div>
+       <p class="page-note">Tap one to open it. It leaves the list once opened.</p>`
+    : '<p class="page-note">Nothing saved. If you tap Look it up or Ask AI without signal, the note waits here until you are back online.</p>';
+  return {
+    title: 'Look up later',
+    html,
+    after: (root) => root.querySelectorAll('[data-i]').forEach((b) => {
+      b.onclick = () => {
+        const l = items[+b.dataset.i];
+        if (!navigator.onLine) return toast('Still offline. Try again when you have signal.');
+        openExternal(l.kind, noteIndex.get(l.id).note);
+        state.lookups = state.lookups.filter((x) => x !== l);
+        save();
+        renderTopPage();
+      };
+    }),
+  };
+}
+
+function settingsPage() {
+  const choice = (group, value, label, on) => `<button type="button" class="choice${on ? ' on' : ''}" data-${group}="${value}">${label}</button>`;
+  const html = `
+    <div class="block"><div class="block-label">Ask AI opens</div>
+      <div class="choices">${Object.entries(AI_NAMES).map(([k, v]) => choice('ai', k, v, state.settings.ai === k)).join('')}</div></div>
+    <div class="block"><div class="block-label">Text size</div>
+      <div class="choices">${Object.entries(TEXT_SIZES).map(([k, v]) => choice('size', k, v, state.settings.textSize === k)).join('')}</div></div>
+    <p class="page-note">Your progress is saved on this phone only. Open Retia from its home-screen icon rather than a browser tab, and don't clear your browser's website data, or your progress will be lost.</p>`;
+  return {
+    title: 'Settings',
+    html,
+    after: (root) => {
+      root.querySelectorAll('[data-ai]').forEach((b) => { b.onclick = () => { state.settings.ai = b.dataset.ai; save(); renderTopPage(); }; });
+      root.querySelectorAll('[data-size]').forEach((b) => { b.onclick = () => { state.settings.textSize = b.dataset.size; save(); applyTextSize(); renderTopPage(); }; });
+    },
+  };
+}
+
+function applyTextSize() { document.body.dataset.text = state.settings.textSize; }
+
+function revisitPage() {
+  const items = dayRecord().read.map((id) => noteIndex.get(id)).filter(Boolean);
+  return {
+    title: "Today's notes",
+    html: `<div class="list">${items.map(({ note }, i) => listButton(note.title, note.subject, `data-i="${i}"`)).join('')}</div>`,
+    after: (root) => root.querySelectorAll('[data-i]').forEach((b) => {
+      b.onclick = () => { const { note, pack } = items[+b.dataset.i]; browse(note, pack, renderTopPage); };
+    }),
+  };
 }
 
 // ---------- Loading screen ----------
 async function start() {
+  applyTextSize();
+  // Ask the browser not to clear Retia's saved data when the phone runs low on space
+  if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
+  // Offline mode (on localhost only with ?sw, so testing always shows the latest files)
+  if ('serviceWorker' in navigator && (location.hostname !== 'localhost' || params.has('sw'))) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+
   const loading = loadPacks();
   if (params.has('nosplash')) { await loading; return route(); }
 
@@ -480,11 +731,16 @@ $('r-pages').addEventListener('click', (e) => {
   const i = [...$('r-pages').children].indexOf(e.target);
   if (i >= 0) turnTo(i);
 });
-$('b-lookup').addEventListener('click', lookItUp);
-$('b-ask').addEventListener('click', askAI);
+$('b-lookup').addEventListener('click', () => external('lookup'));
+$('b-ask').addEventListener('click', () => external('ask'));
+$('r-reminder').addEventListener('click', () => { pageStack.length = 0; openPage(lookupsPage); });
 $('b-see').addEventListener('click', seeAnswer);
 $('b-remembered').addEventListener('click', () => judge(true));
 $('b-forgotten').addEventListener('click', () => judge(false));
-$('b-revisit').addEventListener('click', showRevisitList);
+$('b-revisit').addEventListener('click', () => { pageStack.length = 0; openPage(revisitPage); });
+$('p-back').addEventListener('click', pageBack);
+document.querySelectorAll('[data-menu]').forEach((b) => b.addEventListener('click', openContents));
+window.addEventListener('online', updateReminder);
+window.addEventListener('offline', updateReminder);
 
 start();

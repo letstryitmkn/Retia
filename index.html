@@ -4,7 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#B3BA93">
+  <meta name="description" content="Seven notes a day on politics, philosophy and economics.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Retia">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>Retia</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
@@ -55,9 +63,13 @@
 
   <!-- Reading a note -->
   <section id="read" class="screen paper" hidden>
-    <header class="topbar"><span id="r-where"></span><span id="r-count"></span></header>
+    <header class="topbar">
+      <span id="r-where"></span>
+      <span class="topright"><span id="r-count"></span><button class="menu" type="button" data-menu aria-label="Contents"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg></button></span>
+    </header>
     <div class="dots" id="r-dots"></div>
     <div class="arrears" id="r-arrears" hidden></div>
+    <button class="reminder" id="r-reminder" type="button" hidden></button>
     <article class="note" id="r-note">
       <div class="subject" id="r-subject"></div>
       <h1 class="title" id="r-title"></h1>
@@ -102,7 +114,10 @@
 
   <!-- Day sealed -->
   <section id="sealed" class="screen paper centered" hidden>
-    <header class="topbar"><span id="s-where"></span><span id="s-count"></span></header>
+    <header class="topbar">
+      <span id="s-where"></span>
+      <span class="topright"><span id="s-count"></span><button class="menu" type="button" data-menu aria-label="Contents"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg></button></span>
+    </header>
     <div class="spacer"></div>
     <svg class="seal" id="s-seal" viewBox="0 0 100 100" aria-hidden="true">
       <path d="M50 8 C62 6 68 14 78 16 C88 22 86 32 92 40 C96 52 88 58 90 68 C86 80 76 80 70 88 C60 94 52 90 42 94 C30 92 28 84 18 80 C10 72 14 62 8 54 C6 42 14 38 14 28 C20 16 30 18 38 10 C42 8 46 9 50 8Z" fill="#9B2D20"/>
@@ -118,15 +133,29 @@
     <button class="link" id="b-revisit" type="button">Revisit today's notes</button>
   </section>
 
-  <!-- Messages and lists -->
+  <!-- Messages -->
   <section id="message" class="screen paper centered" hidden>
+    <header class="topbar" style="width:100%">
+      <span></span>
+      <span class="topright"><button class="menu" type="button" data-menu aria-label="Contents"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg></button></span>
+    </header>
     <div class="spacer"></div>
     <h1 class="sealed-title" id="m-title"></h1>
     <p class="sealed-sub" id="m-text"></p>
-    <div class="list" id="m-list"></div>
     <div class="spacer"></div>
-    <button class="link" id="m-back" type="button" hidden>Back</button>
   </section>
+
+  <!-- Contents, Progress, Library, Look up later, Settings -->
+  <section id="page" class="screen paper" hidden>
+    <header class="pagebar">
+      <button class="back" id="p-back" type="button">‹ Back</button>
+      <h1 class="page-title" id="p-title"></h1>
+      <span class="pagebar-end"></span>
+    </header>
+    <div class="page-body" id="p-body"></div>
+  </section>
+
+  <div class="toast" id="toast" role="status" hidden></div>
 
   <script src="app.js"></script>
 </body>
