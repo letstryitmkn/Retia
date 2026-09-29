@@ -1,8 +1,8 @@
 // Offline support: keeps a copy of the app and the Folios on the phone.
 // On every release: bump the number here AND the ?v= on style.css and app.js in index.html.
-const VERSION = 'retia-7';
+const VERSION = 'retia-8';
 const SHELL = [
-  './', 'index.html', 'style.css?v=7', 'app.js?v=7', 'manifest.webmanifest', 'assets/splash.jpg',
+  './', 'index.html', 'style.css?v=8', 'app.js?v=8', 'manifest.webmanifest', 'assets/splash.jpg',
   'assets/fonts/im-fell-english.woff2', 'assets/fonts/im-fell-english-italic.woff2', 'assets/fonts/im-fell-english-sc.woff2',
 ];
 const NETWORK_TIMEOUT_MS = 4000;
@@ -14,9 +14,10 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
+  // Only clear Retia's own old copies: other apps on letstryitmkn.github.io share this storage
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('retia-') && k !== VERSION).map((k) => caches.delete(k))))
       .then(() => self.clients.claim()),
   );
 });

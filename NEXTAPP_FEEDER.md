@@ -114,7 +114,7 @@ Features already built: loading screen · two-page notes with swipe · 7/day cap
 
 1. **Name:** `<title>` + apple title in `index.html`, `manifest.webmanifest`, splash `aria-label`
 2. **Save name — must change:** `STORE_KEY` in `app.js` (e.g. `'newapp.v1'`). All my GitHub Pages apps share one web address (`letstryitmkn.github.io`), so the same key would mix progress between apps
-3. **Offline cache name — must change:** `VERSION` prefix in `sw.js` (e.g. `'newapp-1'`), **and** make the clean-up only delete its own caches: `keys.filter((k) => k.startsWith('newapp-') && k !== VERSION)`. ⚠️ Retia's current `sw.js` deletes *every* other cache on the same address, so fix Retia's too before a second app goes live
+3. **Offline cache name — must change:** `VERSION` prefix in `sw.js` (e.g. `'newapp-1'`), **and** make the clean-up only delete its own caches: `keys.filter((k) => k.startsWith('newapp-') && k !== VERSION)`. Retia's `sw.js` already does this (fixed in v8)
 4. **Colours:** `:root` in `style.css`; status-bar colours in `show()` in `app.js` and `theme-color` in `index.html` + manifest
 5. **Fonts:** download woff2 files into `assets/fonts/`, update `@font-face`, preload links in `index.html`, and `SHELL` in `sw.js`
 6. **Icon:** put artwork in `assets/icon-source.webp`, run `tools/make-icons.ps1`
@@ -159,7 +159,7 @@ Features already built: loading screen · two-page notes with swipe · 7/day cap
 
 ## 10. What's next for Retia (so the next project doesn't forget it)
 
-- Fix `sw.js` cache clean-up before any second app on the same GitHub account (see Swap list #3)
+- ~~Fix `sw.js` cache clean-up before any second app on the same GitHub account~~ Done in v8 (2026-09-29), ahead of the second app, **Umbrarum** (`Desktop\Umbrarum`)
 - Folio II planning when I'm about a week into Folio I (topics in `PPE_PLAN.md`, rounds 1 continues across Folios I–III)
 - Feature backlog in `PROJECT_NOTES.md` §8c (Folio checker, See also links, Weekly Recollection…)
 - Optional: phone-shaped version of the loading artwork so the temple isn't cropped

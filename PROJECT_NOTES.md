@@ -527,3 +527,4 @@ Answered:
 | 2026-09-29 | **Chosen: two pages per note** (i: In short + Explained → Continue; ii: Example + Why it matters → Understood). All 21 notes now fit without scrolling (trimmed "Sunk costs" example slightly) |
 | 2026-09-29 | No progress backup for now |
 | 2026-09-29 | Packs found automatically; just drop the file in `packs/` |
+| 2026-09-29 | **Release v8**: offline clean-up now only deletes Retia's own old copies (`retia-…`), so a second app on the same GitHub address (Umbrarum) keeps its offline copy. Progress was already separate (`retia.v1`) |
