@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#B3BA93">
+  <title>Retia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Loading screen -->
+  <section id="splash" class="screen splash">
+    <div class="splash-frame" aria-hidden="true"></div>
+    <div class="splash-icon"><img src="assets/icon-source.webp" alt=""></div>
+    <div class="splash-name">Retia</div>
+    <div class="spacer"></div>
+    <p class="splash-quote">Icarus laughed as he fell,<br>for he knew</p>
+    <div class="wreath">
+      <svg viewBox="0 0 200 122" aria-hidden="true">
+        <defs>
+          <g id="olive-half" fill="#9DA57F" stroke="#3D4B37" stroke-width="0.7">
+            <path d="M100 112 Q20 110 22 20" fill="none" stroke-width="1"/>
+            <g transform="translate(84.8 110.7) rotate(150)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
+            <g transform="translate(84.8 110.7) rotate(220)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
+            <g transform="translate(65.1 105.5) rotate(140)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
+            <g transform="translate(65.1 105.5) rotate(215)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
+            <g transform="translate(49.1 96.3) rotate(125)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
+            <g transform="translate(49.1 96.3) rotate(200)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
+            <g transform="translate(36.8 83.2) rotate(110)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
+            <g transform="translate(36.8 83.2) rotate(190)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
+            <g transform="translate(28.2 66.1) rotate(100)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
+            <g transform="translate(28.2 66.1) rotate(175)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
+            <g transform="translate(23.3 45) rotate(90)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
+            <g transform="translate(23.3 45) rotate(165)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
+            <g transform="translate(22 20) rotate(-85)"><ellipse cx="6" cy="0" rx="6" ry="2"/></g>
+            <ellipse cx="44" cy="104" rx="2.4" ry="1.8" fill="#3D4B37" stroke="none"/>
+            <ellipse cx="25" cy="58" rx="2.4" ry="1.8" fill="#3D4B37" stroke="none"/>
+          </g>
+        </defs>
+        <use href="#olive-half"/>
+        <g transform="translate(200 0) scale(-1 1)"><use href="#olive-half"/></g>
+      </svg>
+      <p class="motto">To fall means<br>to once have<br>soared.</p>
+    </div>
+    <div class="spacer"></div>
+    <div class="splash-bottom">
+      <div class="loading-line" aria-hidden="true"><i></i></div>
+      <div class="continue">Touch to continue</div>
+    </div>
+  </section>
+
+  <!-- Reading a note -->
+  <section id="read" class="screen paper" hidden>
+    <svg class="sketch" viewBox="0 0 150 150" aria-hidden="true">
+      <g fill="none" stroke="#8A6A45" stroke-width="0.8">
+        <circle cx="75" cy="75" r="70"/><circle cx="75" cy="75" r="50"/><circle cx="75" cy="60" r="30"/>
+        <line x1="5" y1="75" x2="145" y2="75"/><line x1="75" y1="5" x2="75" y2="145"/>
+      </g>
+    </svg>
+    <header class="topbar"><span id="r-where"></span><span id="r-count"></span></header>
+    <div class="dots" id="r-dots"></div>
+    <div class="arrears" id="r-arrears" hidden></div>
+    <article class="note" id="r-note">
+      <div class="subject" id="r-subject"></div>
+      <h1 class="title" id="r-title"></h1>
+      <div class="body" id="r-body"></div>
+    </article>
+    <footer class="actions">
+      <div class="row">
+        <button class="ghost" id="b-lookup" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+          Look it up
+        </button>
+        <button class="ghost" id="b-ask" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 L13.8 10.2 L21 12 L13.8 13.8 L12 21 L10.2 13.8 L3 12 L10.2 10.2 Z"/></svg>
+          Ask AI
+        </button>
+      </div>
+      <button class="primary" id="b-understood" type="button">Understood</button>
+    </footer>
+  </section>
+
+  <!-- Recollection -->
+  <section id="recall" class="screen paper" hidden>
+    <header class="topbar"><span>Recollection</span><span id="c-count"></span></header>
+    <div class="recall-q">
+      <div class="whatis">What is…</div>
+      <h1 class="title" id="c-title"></h1>
+      <div class="hint" id="c-hint"></div>
+    </div>
+    <article class="note recall-a" id="c-answer" hidden>
+      <div class="subject" id="c-subject"></div>
+      <div class="body" id="c-body"></div>
+    </article>
+    <footer class="actions">
+      <button class="outline" id="b-see" type="button">See answer</button>
+      <div class="row" id="c-judge" hidden>
+        <button class="outline" id="b-remembered" type="button">Remembered</button>
+        <button class="outline" id="b-forgotten" type="button">Forgotten</button>
+      </div>
+    </footer>
+  </section>
+
+  <!-- Day sealed -->
+  <section id="sealed" class="screen paper centered" hidden>
+    <header class="topbar"><span id="s-where"></span><span id="s-count"></span></header>
+    <div class="spacer"></div>
+    <svg class="seal" id="s-seal" viewBox="0 0 100 100" aria-hidden="true">
+      <path d="M50 8 C62 6 68 14 78 16 C88 22 86 32 92 40 C96 52 88 58 90 68 C86 80 76 80 70 88 C60 94 52 90 42 94 C30 92 28 84 18 80 C10 72 14 62 8 54 C6 42 14 38 14 28 C20 16 30 18 38 10 C42 8 46 9 50 8Z" fill="#9B2D20"/>
+      <circle cx="50" cy="51" r="30" fill="none" stroke="#7E2418" stroke-width="2"/>
+      <circle cx="50" cy="51" r="26" fill="none" stroke="#7E2418" stroke-width="0.6"/>
+      <text x="50" y="63" text-anchor="middle" font-family="'IM Fell English SC', serif" font-size="34" fill="#E9C9B8">R</text>
+    </svg>
+    <h1 class="sealed-title" id="s-title"></h1>
+    <p class="sealed-sub" id="s-sub"></p>
+    <p class="sealed-streak" id="s-streak"></p>
+    <div class="spacer"></div>
+    <p class="morrow">Return on the morrow.</p>
+    <button class="link" id="b-revisit" type="button">Revisit today's notes</button>
+  </section>
+
+  <!-- Messages and lists -->
+  <section id="message" class="screen paper centered" hidden>
+    <div class="spacer"></div>
+    <h1 class="sealed-title" id="m-title"></h1>
+    <p class="sealed-sub" id="m-text"></p>
+    <div class="list" id="m-list"></div>
+    <div class="spacer"></div>
+    <button class="link" id="m-back" type="button" hidden>Back</button>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
