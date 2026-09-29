@@ -159,7 +159,6 @@ Features already built: loading screen · two-page notes with swipe · 7/day cap
 
 ## 10. What's next for Retia (so the next project doesn't forget it)
 
-- Push v7 (optimisation pass) if not yet pushed
 - Fix `sw.js` cache clean-up before any second app on the same GitHub account (see Swap list #3)
 - Folio II planning when I'm about a week into Folio I (topics in `PPE_PLAN.md`, rounds 1 continues across Folios I–III)
 - Feature backlog in `PROJECT_NOTES.md` §8c (Folio checker, See also links, Weekly Recollection…)
