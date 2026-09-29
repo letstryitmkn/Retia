@@ -270,6 +270,28 @@ Retia/
 6. Later changes: GitHub Desktop → Commit → **Push origin**. The site updates in about a minute
 - Note: the repo is public, so everything in the folder (including these notes) is readable by anyone who finds it
 
+## 8c. Feature ideas (backlog, not decided)
+
+Recommended first:
+1. **Folio checker** (tool on the computer): before pushing a new Folio, checks 7 notes per day, each half ≤ ~75 words, all four labels present, no duplicate titles (a duplicate title would break progress)
+2. **See also links**: a `See also: Opportunity cost` line in a note becomes a tap-through to that note, linking ideas across Philosophy / Economics / Politics (fits the name: Retia = nets)
+3. **Weekly Recollection**: once a week the Recollection round adds a few older notes you remembered, so they don't fade (right now only forgotten ones come back)
+
+Also possible:
+4. **Share a note** with a friend through the phone's share sheet (WhatsApp, Messages…)
+5. **Your own margin notes** on any note, saved on the phone
+6. **Search** the notes you've read
+7. **Read aloud** using the phone's built-in voice (works offline, headphones on the bus)
+8. **Folio finished page**: a colophon-style page with seal and stats when a Folio is complete
+9. **Mastered notes**: remembered 3 times in a row → marked as mastered in the Library
+
+Performance (measured 2026-09-29): a full Folio ≈ 90 KB, a year of 24 Folios ≈ 2.1 MB, reading all 2,520 notes takes ~6 ms. No lag or size problem.
+10. **Later optimisation** (after a few months of Folios): on opening, re-download only the current Folio and keep finished ones from the saved copy, so opening stays quick on weak signal
+
+Not practical right now:
+- Daily reminder notifications (would need a server)
+- Seeing a friend's streak (would need a server + accounts)
+
 ## 9. Build order
 
 - **v1: core**: load a pack → swipe concepts → remember where I stopped → mark done
@@ -497,6 +519,7 @@ Answered:
 | 2026-09-29 | Removed the faint astrolabe circles behind the notes (got in the way of reading). Not pushed yet |
 | 2026-09-29 | Measured: notes are 124–155 words = **~1.5–1.7 phone screens** each (iPhone-size, 375×812). Discussing how to reduce scrolling: cap length / 2 pages per note / smoother scroll |
 | 2026-09-29 | **New loading screen artwork** (my illustration: clouds, sea, temple on a cliff, birds, icon + RETIA + Icarus quote baked in) replaces the olive-wreath layout. `tools/make-splash.ps1` paints out its drawn loading bar + "Loading…" and trims its border → `assets/splash.jpg`. App draws its own double border + sliding line + "Touch to continue" where the bar was. Known: tall phones crop the sides (temple mostly cut); a phone-shaped (9:19.5) version of the art would fix it |
+| 2026-09-29 | **Folio I complete**: Days IV–XV written (84 notes), all 105 notes fact-checked and fit-checked. Topic list in PPE_PLAN.md |
 | 2026-09-29 | **Zoom locked**: no pinch or double-tap zoom (viewport setting + CSS + iPhone gesture blocking). Text size is changed in Settings instead. Release v5 |
 | 2026-09-29 | **Stage 2 built**: Contents menu, Progress, Library, Look up later, Settings, offline mode, home-screen manifest + icons, protected storage. No backup (decided) |
 | 2026-09-29 | **Chosen: two pages per note** (i: In short + Explained → Continue; ii: Example + Why it matters → Understood). All 21 notes now fit without scrolling (trimmed "Sunk costs" example slightly) |

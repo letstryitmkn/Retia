@@ -167,6 +167,30 @@ Politics: Core concepts
 
 ---
 
+## Folio I: full topic list (✅ ALL WRITTEN, 2026-09-29)
+
+All 15 days / 105 notes are in `packs/folio-01.md`. Facts, dates and examples were checked while writing; where a famous story is partly legend or debated (the cobra effect, the red herring's origin, Dunning–Kruger's size), the note says so. Checked: 7 notes per day, 35 per subject, no duplicate titles, all four parts present, every page fits one screen on a standard iPhone. Rotation: the subject in **bold** gets 3 notes that day.
+
+| Day | Philosophy: Thinking tools | Economics: Thinking like an economist | Politics: Core concepts |
+|---|---|---|---|
+| I ✅ | **Argument vs opinion · Premises and conclusion · Valid vs sound** | Scarcity · Opportunity cost | Power · The state |
+| II ✅ | Deductive vs inductive reasoning · Ad hominem | **Incentives · Thinking at the margin · Sunk costs** | Authority · Legitimacy |
+| III ✅ | Straw man · Appeal to authority | Demand · Supply | **Sovereignty · Nation vs state · Rule of law** |
+| IV | **Tu quoque · False dilemma · Slippery slope** | Market equilibrium · Price signals | Separation of powers · Checks and balances |
+| V | Circular reasoning · Red herring | **Shortages and surpluses · Price ceilings · Price floors** | Constitution · Citizenship |
+| VI | Post hoc ergo propter hoc · Correlation vs causation | Elasticity of demand · Substitutes and complements | **Rights · Civil liberties · Freedom of expression** |
+| VII | **Hasty generalisation · Cherry-picking · Survivorship bias** | Production possibility frontier · Absolute advantage | Democracy · Representation |
+| VIII | Moving the goalposts · No true Scotsman | **Comparative advantage · Gains from trade · Division of labour** | Majority rule · Tyranny of the majority |
+| IX | Appeal to nature · Bandwagon fallacy | Diminishing returns · Economies of scale | **Political parties · Interest groups · Civil society** |
+| X | **Confirmation bias · Motivated reasoning · Anchoring** | The invisible hand · Unintended consequences | Public opinion · Political participation |
+| XI | Availability heuristic · Dunning–Kruger effect | **Positive vs normative economics · Economic models · Ceteris paribus** | Consent of the governed · The social contract |
+| XII | Burden of proof · Occam's razor | Rational choice · Cost-benefit analysis | **Accountability · Transparency · Corruption** |
+| XIII | **Necessary vs sufficient conditions · Falsifiability · Base rates** | Time value of money · Risk and return | Bureaucracy · Government vs governance |
+| XIV | Principle of charity · Steelmanning | **Moral hazard · Principal–agent problem · Goodhart's law** | Revolution · Coup d'état |
+| XV | Thought experiments · The Socratic method | Zero-sum vs positive-sum · The seen and the unseen | **Civil disobedience · Political culture · The political spectrum** |
+
+Totals: 35 notes per subject, 105 in the Folio.
+
 ## Open questions
 
 - [x] Note style: **v2, more detail**: In short / Explained / Example / Why it matters, 110–150 words
