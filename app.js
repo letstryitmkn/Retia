@@ -142,45 +142,51 @@ function githubRepo() {
   return { owner, repo: first || host };
 }
 
+const PACKLIST_KEY = STORE_KEY + '.packlist';
+function savedPackList() {
+  try { return JSON.parse(localStorage.getItem(PACKLIST_KEY)) || []; } catch (e) { return []; }
+}
+
+// Asks GitHub (or the local test server) which Folio files exist; falls back to the last saved list
 async function listPackFiles() {
+  if (!navigator.onLine) return savedPackList();
   const gh = githubRepo();
-  if (gh) {
-    try {
+  try {
+    let files;
+    if (gh) {
       const res = await fetchWithTimeout(`https://api.github.com/repos/${gh.owner}/${gh.repo}/contents/packs`);
-      if (res.ok) {
-        const files = (await res.json()).filter((f) => f.type === 'file' && f.name.endsWith('.md')).map((f) => f.name).sort();
-        localStorage.setItem(STORE_KEY + '.packlist', JSON.stringify(files));
-        return files;
-      }
-    } catch (e) { /* offline: fall back below */ }
-  } else {
-    // Local testing: read the dev server's folder listing
-    try {
+      if (!res.ok) return savedPackList();
+      files = (await res.json()).filter((f) => f.type === 'file' && f.name.endsWith('.md')).map((f) => f.name);
+    } else {
+      // Local testing: read the dev server's folder listing
       const res = await fetchWithTimeout('packs/', { cache: 'no-store' });
-      if (res.ok) {
-        const html = await res.text();
-        const files = [...html.matchAll(/href="([^"]+\.md)"/g)].map((m) => decodeURIComponent(m[1].split('/').pop())).sort();
-        if (files.length) {
-          localStorage.setItem(STORE_KEY + '.packlist', JSON.stringify(files));
-          return files;
-        }
-      }
-    } catch (e) { /* fall back below */ }
+      if (!res.ok) return savedPackList();
+      files = [...(await res.text()).matchAll(/href="([^"]+\.md)"/g)].map((m) => decodeURIComponent(m[1].split('/').pop()));
+    }
+    files.sort();
+    localStorage.setItem(PACKLIST_KEY, JSON.stringify(files));
+    return files;
+  } catch (e) {
+    return savedPackList(); // offline or too slow
   }
-  try { return JSON.parse(localStorage.getItem(STORE_KEY + '.packlist')) || []; } catch (e) { return []; }
 }
 
 let packs = [];
 const noteIndex = new Map(); // id -> { note, pack }
 
 async function loadPacks() {
-  const files = await listPackFiles();
-  const loaded = await Promise.all(files.map(async (file) => {
-    try {
-      const res = await fetchWithTimeout('packs/' + encodeURIComponent(file), { cache: 'no-cache' });
-      return res.ok ? parsePack(file, await res.text()) : null;
-    } catch (e) { return null; }
-  }));
+  // Start downloading the Folios we already know about while GitHub is asked for new ones
+  const downloads = new Map();
+  const download = (file) => {
+    if (!downloads.has(file)) {
+      downloads.set(file, fetchWithTimeout('packs/' + encodeURIComponent(file), { cache: 'no-cache' })
+        .then(async (res) => (res.ok ? parsePack(file, await res.text()) : null))
+        .catch(() => null));
+    }
+    return downloads.get(file);
+  };
+  savedPackList().forEach(download);
+  const loaded = await Promise.all((await listPackFiles()).map(download));
   packs = loaded.filter((p) => p && p.notes.length);
   noteIndex.clear();
   for (const pack of packs) for (const note of pack.notes) noteIndex.set(note.id, { note, pack });
@@ -200,10 +206,11 @@ function nextNote(pack) { return pack.notes.find((n) => !state.done[n.id]); }
 // ---------- Screens ----------
 const $ = (id) => document.getElementById(id);
 const screens = ['splash', 'read', 'recall', 'sealed', 'message', 'page'];
+const themeColor = document.querySelector('meta[name="theme-color"]');
 // The phone's status bar takes this colour: sage on the loading screen, paper inside the app
 function show(name) {
   for (const s of screens) $(s).hidden = s !== name;
-  document.querySelector('meta[name="theme-color"]').content = name === 'splash' ? '#B3BA93' : '#E6D3AE';
+  themeColor.content = name === 'splash' ? '#B3BA93' : '#E6D3AE';
 }
 
 let current = null;       // note being read
@@ -706,9 +713,12 @@ async function start() {
   applyTextSize();
   // Ask the browser not to clear Retia's saved data when the phone runs low on space
   if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
-  // Offline mode (on localhost only with ?sw, so testing always shows the latest files)
+  // Offline mode, set up once the first screen is showing so it doesn't slow it down
+  // (on localhost only with ?sw, so testing always shows the latest files)
   if ('serviceWorker' in navigator && (location.hostname !== 'localhost' || params.has('sw'))) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    const register = () => navigator.serviceWorker.register('sw.js').catch(() => {});
+    if (document.readyState === 'complete') register();
+    else window.addEventListener('load', register);
   }
 
   const loading = loadPacks();

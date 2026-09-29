@@ -13,14 +13,17 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
   <!-- ?v= must match VERSION in sw.js; change both on every release so phones never mix old and new files -->
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
   <link rel="preload" href="assets/splash.jpg" as="image">
+  <link rel="preload" href="assets/fonts/im-fell-english.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/im-fell-english-italic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/im-fell-english-sc.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="icon-menu" viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></symbol>
+  </svg>
 
   <!-- Loading screen -->
   <!-- The artwork (assets/splash.jpg) already contains the icon, name and quote -->
@@ -33,10 +36,10 @@
   </section>
 
   <!-- Reading a note -->
-  <section id="read" class="screen paper" hidden>
+  <section id="read" class="screen" hidden>
     <header class="topbar">
       <span id="r-where"></span>
-      <span class="topright"><span id="r-count"></span><button class="menu" type="button" data-menu aria-label="Contents"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg></button></span>
+      <span class="topright"><span id="r-count"></span><button class="menu" type="button" data-menu aria-label="Contents"><svg aria-hidden="true"><use href="#icon-menu"/></svg></button></span>
     </header>
     <div class="dots" id="r-dots"></div>
     <div class="arrears" id="r-arrears" hidden></div>
@@ -63,7 +66,7 @@
   </section>
 
   <!-- Recollection -->
-  <section id="recall" class="screen paper" hidden>
+  <section id="recall" class="screen" hidden>
     <header class="topbar"><span>Recollection</span><span id="c-count"></span></header>
     <div class="recall-q">
       <div class="whatis">What is…</div>
@@ -84,10 +87,10 @@
   </section>
 
   <!-- Day sealed -->
-  <section id="sealed" class="screen paper centered" hidden>
+  <section id="sealed" class="screen centered" hidden>
     <header class="topbar">
       <span id="s-where"></span>
-      <span class="topright"><span id="s-count"></span><button class="menu" type="button" data-menu aria-label="Contents"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg></button></span>
+      <span class="topright"><span id="s-count"></span><button class="menu" type="button" data-menu aria-label="Contents"><svg aria-hidden="true"><use href="#icon-menu"/></svg></button></span>
     </header>
     <div class="spacer"></div>
     <svg class="seal" id="s-seal" viewBox="0 0 100 100" aria-hidden="true">
@@ -105,10 +108,10 @@
   </section>
 
   <!-- Messages -->
-  <section id="message" class="screen paper centered" hidden>
-    <header class="topbar" style="width:100%">
+  <section id="message" class="screen centered" hidden>
+    <header class="topbar">
       <span></span>
-      <span class="topright"><button class="menu" type="button" data-menu aria-label="Contents"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg></button></span>
+      <span class="topright"><button class="menu" type="button" data-menu aria-label="Contents"><svg aria-hidden="true"><use href="#icon-menu"/></svg></button></span>
     </header>
     <div class="spacer"></div>
     <h1 class="sealed-title" id="m-title"></h1>
@@ -117,17 +120,16 @@
   </section>
 
   <!-- Contents, Progress, Library, Look up later, Settings -->
-  <section id="page" class="screen paper" hidden>
+  <section id="page" class="screen" hidden>
     <header class="pagebar">
       <button class="back" id="p-back" type="button">‹ Back</button>
       <h1 class="page-title" id="p-title"></h1>
-      <span class="pagebar-end"></span>
     </header>
     <div class="page-body" id="p-body"></div>
   </section>
 
   <div class="toast" id="toast" role="status" hidden></div>
 
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

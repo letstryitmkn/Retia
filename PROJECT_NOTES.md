@@ -286,7 +286,7 @@ Also possible:
 9. **Mastered notes**: remembered 3 times in a row → marked as mastered in the Library
 
 Performance (measured 2026-09-29): a full Folio ≈ 90 KB, a year of 24 Folios ≈ 2.1 MB, reading all 2,520 notes takes ~6 ms. No lag or size problem.
-10. **Later optimisation** (after a few months of Folios): on opening, re-download only the current Folio and keep finished ones from the saved copy, so opening stays quick on weak signal
+10. **Later optimisation** (after a few months of Folios): on opening, re-download only the current Folio and keep finished ones from the saved copy. Partly done in v7: Folios now download in parallel with the GitHub check, and unchanged files are only re-checked (not re-downloaded)
 
 Not practical right now:
 - Daily reminder notifications (would need a server)
@@ -519,6 +519,7 @@ Answered:
 | 2026-09-29 | Removed the faint astrolabe circles behind the notes (got in the way of reading). Not pushed yet |
 | 2026-09-29 | Measured: notes are 124–155 words = **~1.5–1.7 phone screens** each (iPhone-size, 375×812). Discussing how to reduce scrolling: cap length / 2 pages per note / smoother scroll |
 | 2026-09-29 | **New loading screen artwork** (my illustration: clouds, sea, temple on a cliff, birds, icon + RETIA + Icarus quote baked in) replaces the olive-wreath layout. `tools/make-splash.ps1` paints out its drawn loading bar + "Loading…" and trims its border → `assets/splash.jpg`. App draws its own double border + sliding line + "Touch to continue" where the bar was. Known: tall phones crop the sides (temple mostly cut); a phone-shaped (9:19.5) version of the art would fix it |
+| 2026-09-29 | **Optimisation pass** (release v7): fonts now stored in the app (`assets/fonts/`, SIL Open Font License) instead of Google Fonts, so no outside requests, no waiting on Google before the page draws, and fonts always work offline · Folios start downloading at the same time as the GitHub check (was one after the other), and offline skips the check entirely · offline copy no longer pre-downloads the big icon images (~450 KB less on first load; phones fetch icons themselves when adding to the home screen) · offline setup waits until the first screen is showing · removed a slow "fixed" background, old unused styles/colours, and 3 duplicate copies of the menu icon. Full day, Recollection, seal, menu pages all retested |
 | 2026-09-29 | **Galaxy Fold / tablets checked** (cover screen 344×882, unfolded 884×736): reading fits on both. Fixed: unfolded loading screen showed tan strips beside a green column → now centred artwork fading into sage, border around the art (temple visible again on wide screens); paper shading now covers the whole screen (no column edge). On the narrow cover screen the loading-screen quote sits close to the border but fits. Release v6 |
 | 2026-09-29 | **Folio I complete**: Days IV–XV written (84 notes), all 105 notes fact-checked and fit-checked. Topic list in PPE_PLAN.md |
 | 2026-09-29 | **Zoom locked**: no pinch or double-tap zoom (viewport setting + CSS + iPhone gesture blocking). Text size is changed in Settings instead. Release v5 |

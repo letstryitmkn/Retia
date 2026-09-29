@@ -1,24 +1,27 @@
+/* Fonts are stored with the app (SIL Open Font License), so they load instantly and work offline */
+@font-face { font-family: 'IM Fell English'; font-style: normal; font-weight: 400; font-display: swap; src: url('assets/fonts/im-fell-english.woff2') format('woff2'); }
+@font-face { font-family: 'IM Fell English'; font-style: italic; font-weight: 400; font-display: swap; src: url('assets/fonts/im-fell-english-italic.woff2') format('woff2'); }
+@font-face { font-family: 'IM Fell English SC'; font-style: normal; font-weight: 400; font-display: swap; src: url('assets/fonts/im-fell-english-sc.woff2') format('woff2'); }
+
 :root {
   --paper: #E6D3AE;
   --ink: #3E2A1A;
   --ink-soft: #6B4E32;
   --line: #8A6A45;
   --red: #9B2D20;
-  --red-dark: #7E2418;
   --parchment: #F4ECD8;
   --sage: #B3BA93;
   --sage-ink: #2F3B2A;
-  --sage-line: #4A5D48;
   --serif: 'IM Fell English', Georgia, 'Times New Roman', serif;
   --caps: 'IM Fell English SC', 'IM Fell English', Georgia, serif;
 }
 
 * { box-sizing: border-box; margin: 0; }
-html, body { height: 100%; }
 /* No pinch or double-tap zoom (text size is set in Settings instead) */
-html, body { touch-action: pan-x pan-y; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body { height: 100%; touch-action: pan-x pan-y; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+/* The paper shading covers the whole screen, so wide screens (unfolded Fold, tablets) have no visible column edge */
 body {
-  background: var(--paper);
+  background: radial-gradient(ellipse at 50% 40%, #EBDAB8 0%, var(--paper) 60%, #DCC59C 100%);
   color: var(--ink);
   font-family: var(--serif);
   -webkit-font-smoothing: antialiased;
@@ -37,11 +40,9 @@ body {
   padding: calc(env(safe-area-inset-top) + 18px) 20px calc(env(safe-area-inset-bottom) + 18px);
   overflow: hidden;
 }
-/* The paper shading sits on the whole screen, so wide screens (unfolded Fold, tablets) have no visible column edge */
-body { background: radial-gradient(ellipse at 50% 40%, #EBDAB8 0%, var(--paper) 60%, #DCC59C 100%) fixed; }
-.paper { background: transparent; }
 .spacer { flex: 1; }
 .centered { align-items: center; text-align: center; }
+.centered .topbar { width: 100%; }
 
 /* ---------- Loading screen ---------- */
 /* The artwork always fills the screen height. Tall phones crop a little off each side;
@@ -107,7 +108,6 @@ body { background: radial-gradient(ellipse at 50% 40%, #EBDAB8 0%, var(--paper) 
 .note {
   flex: 1;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   margin: 24px -8px 16px;
   padding: 0 12px 24px;
   position: relative;
@@ -155,7 +155,7 @@ button:active { transform: scale(.98); }
 .link { background: none; border: 0; color: var(--ink-soft); font-style: italic; font-size: 16px; text-decoration: underline; text-underline-offset: 3px; min-height: 40px; }
 
 /* ---------- Recollection ---------- */
-.recall-q { text-align: center; margin: auto 0; transition: margin .3s; }
+.recall-q { text-align: center; margin: auto 0; }
 .whatis { font-style: italic; font-size: 19px; color: var(--ink-soft); }
 .recall-q .title { margin: 8px 0 10px; }
 .hint { font-style: italic; font-size: 15px; color: var(--ink-soft); min-height: 20px; }
@@ -176,13 +176,13 @@ button:active { transform: scale(.98); }
 .sealed-sub { font-style: italic; font-size: 17px; color: var(--ink-soft); margin-top: 6px; }
 .sealed-streak { font-size: 16px; color: var(--ink-soft); margin-top: 10px; }
 .morrow { font-style: italic; font-size: 20px; color: var(--ink-soft); }
-#sealed .topbar { width: 100%; }
 
 /* ---------- Pages (Contents, Progress, Library, Look up later, Settings) ---------- */
 .pagebar { display: grid; grid-template-columns: 80px 1fr 80px; align-items: center; }
+.pagebar::after { content: ''; } /* empty third column keeps the title centred */
 .back { min-height: 0; padding: 6px 0; background: none; border: 0; text-align: left; font-style: italic; font-size: 17px; color: var(--ink-soft); }
 .page-title { font-family: var(--caps); font-weight: normal; font-size: 22px; letter-spacing: 2px; text-align: center; }
-.page-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; margin: 18px -8px 0; padding: 0 8px 24px; }
+.page-body { flex: 1; overflow-y: auto; margin: 18px -8px 0; padding: 0 8px 24px; }
 .page-note { font-style: italic; font-size: 15.5px; line-height: 1.55; color: var(--ink-soft); margin-top: 16px; }
 
 .list { width: 100%; text-align: left; }
