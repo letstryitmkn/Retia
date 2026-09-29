@@ -76,7 +76,7 @@ Politics: Core concepts
 ### Economics | Sunk costs
 **In short:** A sunk cost is money, time or effort already spent that you can't get back.
 **Explained:** Because it's gone whatever you decide next, it shouldn't affect your next decision; only future costs and benefits should. But people hate "wasting" what they've put in, so they stick with bad choices. That's the sunk cost fallacy.
-**Example:** You bought a concert ticket, but on the night you're ill and it's pouring with rain. The money is spent either way, so the only real question is: "Would I rather be at the concert or at home right now?" On a bigger scale, Britain and France kept funding the supersonic Concorde long after it was clear it would never make money, partly because so much had already been spent. It's sometimes called the "Concorde fallacy".
+**Example:** You bought a concert ticket, but on the night you feel ill. The money is spent either way, so the only real question is: "Would I rather be at the concert or at home right now?" Britain and France kept funding the supersonic Concorde long after it was clearly a money-loser, partly because so much had already been spent. It's even called the "Concorde fallacy".
 **Why it matters:** "We've come too far to stop now" is one of the most expensive sentences in business and politics.
 
 ### Politics | Authority

@@ -26,7 +26,8 @@ Not just a definition. Each note = **what it is + how it works + a real example 
 - **Explained:** 2–4 sentences on how it works: the nuance, the types, a common confusion, or who came up with it
 - **Example:** a concrete everyday or real-world case, ideally one that shows the nuance (a contrast, a flip side, a hidden part)
 - **Why it matters:** one or two lines on where you'll run into it or how to use it
-- Length: about **110–150 words**, around a minute to read. May need a small scroll on a phone; the Understood button stays pinned at the bottom
+- Length: about **110–150 words**, around a minute to read
+- The app shows each note as **two pages**: In short + Explained, then Example + Why it matters. Keep each half to about **75 words** so neither page needs scrolling
 - Title = the thing itself ("Opportunity cost"), because the Recollection round asks "What is… opportunity cost?"
 
 Template:

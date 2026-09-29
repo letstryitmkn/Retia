@@ -88,9 +88,18 @@ function inline(s) {
   return escapeHtml(smartQuotes(s)).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
 }
 function plainText(s) { return s.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1'); }
+// Each note is two pages: In short + Explained, then Example + Why it matters
+function splitPages(note) {
+  const at = note.paras.findIndex((p) => /^\*\*Example/i.test(p));
+  if (at > 0) return [note.paras.slice(0, at), note.paras.slice(at)];
+  if (note.paras.length < 2) return [note.paras];
+  const mid = Math.ceil(note.paras.length / 2);
+  return [note.paras.slice(0, mid), note.paras.slice(mid)];
+}
+
 // "**In short:** text" becomes a small label on its own line above the text
-function renderBody(note) {
-  return note.paras.map((p) => {
+function renderParas(paras) {
+  return paras.map((p) => {
     const m = p.match(/^\*\*([^*]+?):\*\*\s*(.*)$/);
     return m ? `<p><span class="label">${escapeHtml(m[1])}</span>${inline(m[2])}</p>` : `<p>${inline(p)}</p>`;
   }).join('');
@@ -221,17 +230,49 @@ function showRead(note, pack, animate = false) {
   const theme = pack.themes[note.subject];
   $('r-subject').textContent = note.subject ? (theme ? `${note.subject} · ${theme}` : note.subject) : '';
   $('r-title').textContent = note.title;
-  $('r-body').innerHTML = renderBody(note);
-  $('b-understood').textContent = browsing ? 'Back' : 'Understood';
-
-  const card = $('r-note');
-  card.scrollTop = 0;
-  card.classList.remove('out', 'in');
-  if (animate) { void card.offsetWidth; card.classList.add('in'); }
+  pages = splitPages(note);
+  renderPage(0, animate);
   show('read');
 }
 
+let pages = [];
+let page = 0;
+function renderPage(index, animate) {
+  page = index;
+  const last = page === pages.length - 1;
+  $('r-body').innerHTML = renderParas(pages[page]);
+  $('r-pages').hidden = pages.length < 2;
+  $('r-pages').innerHTML = pages.map((_, i) => `<span class="${i === page ? 'on' : ''}">${['i', 'ii', 'iii'][i] || i + 1}</span>`).join(' · ');
+
+  const button = $('b-understood');
+  button.textContent = !last ? 'Continue' : browsing ? 'Back' : 'Understood';
+  button.className = last ? 'primary' : 'next';
+
+  const card = $('r-note');
+  card.scrollTop = 0;
+  card.classList.remove('out', 'in', 'back');
+  if (animate) { void card.offsetWidth; card.classList.add(animate === 'back' ? 'back' : 'in'); }
+}
+
 let turning = false;
+function turnTo(index) {
+  if (turning || index < 0 || index >= pages.length || index === page) return;
+  turning = true;
+  const card = $('r-note');
+  card.classList.remove('in', 'back');
+  card.classList.add(index > page ? 'out' : 'out-back');
+  setTimeout(() => {
+    turning = false;
+    card.classList.remove('out', 'out-back');
+    renderPage(index, index > page ? true : 'back');
+  }, 200);
+}
+
+function advance() {
+  if (page < pages.length - 1) turnTo(page + 1);
+  else understood();
+}
+
 function understood() {
   if (turning || !current) return;
   if (browsing) return showRevisitList();
@@ -252,17 +293,19 @@ function understood() {
   }, 220);
 }
 
-// Swipe left on the note = Understood (like turning a page)
+// Swipe left = next page (then Understood), swipe right = previous page
 (function setupSwipe() {
   let x0 = null, y0 = null;
   const card = $('r-note');
   card.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
   card.addEventListener('touchend', (e) => {
-    if (x0 === null || browsing) return;
+    if (x0 === null) return;
     const dx = e.changedTouches[0].clientX - x0;
     const dy = e.changedTouches[0].clientY - y0;
     x0 = null;
-    if (dx < -70 && Math.abs(dy) < 50) understood();
+    if (Math.abs(dy) > 50) return;
+    if (dx < -70 && !(browsing && page === pages.length - 1)) advance();
+    else if (dx > 70) turnTo(page - 1);
   }, { passive: true });
 })();
 
@@ -318,7 +361,7 @@ function showRecallItem() {
   $('c-title').textContent = `${note.title}?`;
   $('c-hint').textContent = rec.read.includes(id) ? 'think on it first' : 'from an earlier day';
   $('c-subject').textContent = note.subject;
-  $('c-body').innerHTML = renderBody(note);
+  $('c-body').innerHTML = renderParas(splitPages(note)[0]);
   $('c-answer').hidden = true;
   $('c-answer').scrollTop = 0;
   $('c-judge').hidden = true;
@@ -432,7 +475,11 @@ async function start() {
 }
 
 // ---------- Wire up ----------
-$('b-understood').addEventListener('click', understood);
+$('b-understood').addEventListener('click', advance);
+$('r-pages').addEventListener('click', (e) => {
+  const i = [...$('r-pages').children].indexOf(e.target);
+  if (i >= 0) turnTo(i);
+});
 $('b-lookup').addEventListener('click', lookItUp);
 $('b-ask').addEventListener('click', askAI);
 $('b-see').addEventListener('click', seeAnswer);

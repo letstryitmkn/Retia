@@ -85,8 +85,6 @@ body {
 .dots i.on { background: var(--red); border-color: var(--red); }
 .arrears { font-size: 14px; font-style: italic; color: var(--red); margin-top: 8px; position: relative; }
 
-.sketch { position: absolute; right: -70px; top: 150px; width: 230px; opacity: .28; pointer-events: none; }
-
 .note {
   flex: 1;
   overflow-y: auto;
@@ -102,10 +100,18 @@ body {
 .body .label { display: block; font-family: var(--caps); font-size: 15px; letter-spacing: 1px; color: var(--ink-soft); margin-bottom: 4px; }
 .body strong { font-weight: normal; color: var(--ink-soft); }
 
-.note.out { animation: turnOut .22s ease-in forwards; }
+.pages { font-style: italic; font-size: 16px; color: #A88B64; margin: -14px 0 22px; }
+.pages span { cursor: pointer; padding: 4px 2px; }
+.pages span.on { color: var(--ink-soft); }
+
+.note.out { animation: turnOut .2s ease-in forwards; }
+.note.out-back { animation: turnOutBack .2s ease-in forwards; }
 .note.in { animation: turnIn .3s ease-out; }
+.note.back { animation: turnInBack .3s ease-out; }
 @keyframes turnOut { to { transform: translateX(-48px); opacity: 0; } }
+@keyframes turnOutBack { to { transform: translateX(48px); opacity: 0; } }
 @keyframes turnIn { from { transform: translateX(48px); opacity: 0; } }
+@keyframes turnInBack { from { transform: translateX(-48px); opacity: 0; } }
 
 /* ---------- Buttons ---------- */
 .actions { display: flex; flex-direction: column; gap: 9px; position: relative; }
@@ -123,6 +129,7 @@ button:active { transform: scale(.98); }
 .ghost { flex: 1; background: transparent; border: 1px dashed var(--line); color: #4A3423; font-size: 16.5px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
 .ghost svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .primary { background: var(--red); color: var(--parchment); border: 0; font-size: 20px; min-height: 52px; }
+.next { background: transparent; border: 1px solid var(--ink); color: var(--ink); font-size: 20px; min-height: 52px; }
 .outline { flex: 1; background: transparent; border: 1px solid var(--ink); color: var(--ink); font-size: 18px; }
 .link { background: none; border: 0; color: var(--ink-soft); font-style: italic; font-size: 16px; text-decoration: underline; text-underline-offset: 3px; min-height: 40px; }
 

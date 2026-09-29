@@ -72,7 +72,10 @@ Politics: Core concepts
 
 **Writing rules**
 - Bite-sized but not just a definition: **what it is + how it works + a real example + why it matters**, in plain words a normal person gets
-- About **110–150 words** per note (about a minute to read). A note may need a small scroll; the **Understood button stays pinned** at the bottom of the screen
+- About **110–150 words** per note (about a minute to read)
+- **Two pages per note, no scrolling**: page i = In short + Explained, page ii = Example + Why it matters. Keep each half to about **75 words** so it fits one phone screen
+- Page i has a **Continue** button (ink outline); page ii has the red **Understood**. Swipe left = next page, swipe right = back, or tap "i · ii" under the title
+- Recollection's See answer shows page i only (In short + Explained)
 - It's fine to write a Folio in weekly chunks; the app should accept a partly filled Folio
 
 ---
@@ -471,5 +474,8 @@ Answered:
 | 2026-09-29 | Published to GitHub Pages; tested on phone: works |
 | 2026-09-29 | Phone feedback fixes: **more spacing** in notes (labels like "In short" on their own line, taller lines, bigger gaps, wider margins); **status bar** now tan inside the app (was sage green from the loading screen); **loading screen 3.5 s** (was 5 s); curly quotes |
 | 2026-09-29 | Loading screen: "Icarus laughed as he fell, for he knew" enlarged (23px → 29px) |
+| 2026-09-29 | Removed the faint astrolabe circles behind the notes (got in the way of reading). Not pushed yet |
+| 2026-09-29 | Measured: notes are 124–155 words = **~1.5–1.7 phone screens** each (iPhone-size, 375×812). Discussing how to reduce scrolling: cap length / 2 pages per note / smoother scroll |
+| 2026-09-29 | **Chosen: two pages per note** (i: In short + Explained → Continue; ii: Example + Why it matters → Understood). All 21 notes now fit without scrolling (trimmed "Sunk costs" example slightly) |
 | 2026-09-29 | No progress backup for now |
 | 2026-09-29 | Packs found automatically; just drop the file in `packs/` |
