@@ -252,7 +252,7 @@ Retia/
 - **Library**: every Folio with status (Current / Paused / Not started / Finished) → open one to see its themes and all notes by day; tap a read note to re-read it; "Make this my current Folio" to switch
 - **Look up later**: with no signal, Look it up / Ask AI saves the note and shows "No signal. Saved to Look up later." Back online, a red reminder appears under the dots; tap a saved note to open it (it then leaves the list)
 - **Settings**: Ask AI opens ChatGPT or Claude; text size Small / Medium / Large (Large may need a small scroll)
-- **Offline mode** (`sw.js`): keeps the app, fonts and Folios on the phone; new Folios download when online (4 s timeout on slow signal). **When app files change, bump `VERSION` in sw.js** so phones take the new copy; updates show on the **second** open after a push
+- **Offline mode** (`sw.js`): keeps the app, fonts and Folios on the phone; new Folios download when online (4 s timeout on slow signal). **On every release, bump `VERSION` in sw.js AND the `?v=` on style.css / app.js in index.html** (same number), so phones never mix old and new files; updates show on the **second** open after a push. (Learned the hard way: without `?v=`, a phone showed the new page with the old style.css → blank green loading screen)
 - **Home-screen setup** (`manifest.webmanifest` + meta tags): opens full screen like a real app, with the wing icon
 - **Protected storage**: the app asks the browser not to clear its data when space runs low
 - **Icons**: `tools/make-icons.ps1` fills the black corners of `assets/icon-source.webp` with sage, crops square, exports 512 / 192 / 180 (iPhone) / 32 (tab) / maskable 512 (Android). Rerun it if the icon art changes
